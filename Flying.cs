@@ -80,6 +80,7 @@ public class Flying : MonoBehaviour
 			//head.transform.position.
 
 
+        // FOR LATER: Look into local.transform position and how it can be used for purposes of rotation.
 		} else if (LeftHand.transform.position.y > RightHand.transform.position.y + .4) {
 
 			Debug.Log ("Head position");
