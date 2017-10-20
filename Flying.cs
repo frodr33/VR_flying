@@ -6,119 +6,166 @@ using UnityEngine;
 public class Flying : MonoBehaviour
 {
     //Flap force
-    private int force = 300;
-	private int rotation_scalar = 15;
-	private bool flying = false;
-	Rigidbody rb;
-	Vector3 destination_forward;
-	Vector3 lh_relative;
-	Vector3 rh_relative;
+    public float force = .0000000000000000001f;
 
 	public GameObject LeftHand;
 	public GameObject RightHand;
 	public GameObject head;
 	public GameObject CameraRig;
-	public GameObject Player;
 
-	/********************************************************************************
-	 * Changes: 10/16
-	 * 1). Rotation is now possible by rotating around + or - y axis
-	 * 2). Changed global variable Vector.foward to local variable transform.foward
-	 * 3). Some work was done for smoothing, all of it is commeneted out below. Not sure if 
-	 * 	   this will work. Still researching ideas, but will involve deltatime some how
-	 * 
-	 * Changes: 10/18
-	 * 1). Put in feature that allows arms pointing backwards to cause forward motion
-	 * 2). Problems...only works when not rotating. Trying to figure out how to make it for all directions
-	 * 3). Smooth Transitions still a problem
-	 * 
-	 */
+
+	public bool flying;
 
     // Use this for initialization
     void Start()
     {
-		//rb = GetComponent<Rigidbody> ();
-		//destination_forward = rb.transform.position;
-
-
 		
     }
 
     // Update is called once per frame
     void FixedUpdate()
 	{
-		
-
-		lh_relative = head.transform.InverseTransformPoint (LeftHand.transform.position);
-		rh_relative = head.transform.InverseTransformPoint (RightHand.transform.position);
-
-		Debug.Log ("TESTTTTTTTTTTTTT");
-		Debug.Log (lh_relative.x);
-		Debug.Log (head.transform.position.x);
-		Debug.Log (transform.forward.x);
-		
-		if (Input.GetKeyDown ("space")) {
-			this.gameObject.GetComponent<Renderer> ().enabled = true;
-			flying = true;
+		//Debug.Log ("aesga menrbaertbgasd");
+		newFunction ();
+		//if (flying == true) {
+			//StartCoroutine (Pause ());
 		}
-		if (flying == true) {
-			newFunction ();
-			//rb.AddForce (destination_forward * Time.deltaTime * 100f);
-		}
-		
-	}
+
+
+
+
+	// delay next loop of update
+	//IEnumerator Pause(){
+	//	Debug.Log ("testttttttttttttttttttttttttttttttttttttt");
+	//	yield return new WaitForSecondsRealtime (450);
+	//}
+
+
+
 
 	public void newFunction()
 	{
 		if (LeftHand.transform.position.y >= head.transform.position.y &&
 		    RightHand.transform.position.y >= head.transform.position.y) {
 				
+
+
+			/**
+			***************************************************************************************************************
+			What was done 10 pm- 12 am October 2nd
+				-Implemented Leaning motion for turning left and right
+				-Now able to land on terrain (Colliders on terrain and camera rig, freeze rotation in rigid body
+				-Now able to put both hands completely down to fly downwards, otherwise will slowly go down (can adjust)
+
+			*/
+
 			// Fly Forward
-			//GetComponent<Rigidbody> ().AddForce (transform.forward * force);
-			//destination_forward = transform.forward * force;
+			GetComponent<Rigidbody> ().AddForce (Vector3.forward * force);
+			//Rigidbody. = Vector3.ClampMagnitude (rigidbody.velocity.x, 10);
 
 			// Fly Upwards
-			GetComponent<Rigidbody> ().AddForce (Vector3.up * force);
+			GetComponent<Rigidbody> ().AddForce ( Vector3.up * force);
+
 			flying = true;
+			//yield WaitForSecondsRealtime (5);
 
 
-		// transform.foward.x is a local variable while lefthand.transform.foward.z is a global variable
-		//} else if (LeftHand.transform.position.z < transform.forward.x && RightHand.transform.position.z < transform.forward.x) {
+			//Vector3 newposition = head.transform.position;
+			//Debug.Log ("TESTTTTTTT");
+			//newposition.y += 10000;
+			//head.transform.position = newposition;
+			//head.transform.position.
 
-		}else if (lh_relative.z < transform.forward.x && rh_relative.z < transform.forward.x){
-		
-			GetComponent<Rigidbody> ().AddForce (transform.forward * force);
-
-		
 
 		} else if (LeftHand.transform.position.y > RightHand.transform.position.y + .4) {
-			
-			//GetComponent<Rigidbody> ().AddForce (Vector3.right * force);
 
-			transform.Rotate (Vector3.up * Time.deltaTime * rotation_scalar);
-			GetComponent<Rigidbody> ().AddForce (transform.forward * force);
+			Debug.Log ("Head position");
+			Debug.Log (head.transform.position);
+			Debug.Log ("Lefthand y value");
+			Debug.Log (LeftHand.transform.position.y);
+			Debug.Log ("Right Hand y value");
+			Debug.Log (RightHand.transform.position.y);
 
+			GetComponent<Rigidbody> ().AddForce (Vector3.right * force);
+			GetComponent<Rigidbody> ().AddForce (Vector3.forward * force);
 
 		} else if (RightHand.transform.position.y > LeftHand.transform.position.y + .4f) {
 
-			//GetComponent<Rigidbody> ().AddForce (Vector3.left * force);
-			transform.Rotate (-Vector3.up * Time.deltaTime * rotation_scalar);
-			GetComponent<Rigidbody> ().AddForce (transform.forward * force);
-
+			GetComponent<Rigidbody> ().AddForce (Vector3.left * force);
+			GetComponent<Rigidbody> ().AddForce (Vector3.forward * force);
 
 		} else if (LeftHand.transform.position.y < head.transform.position.y - .6f &&
 		           RightHand.transform.position.y < head.transform.position.y - .6f) {
 
 
 			GetComponent<Rigidbody> ().AddForce (Vector3.down * force);
-			GetComponent<Rigidbody> ().AddForce (transform.forward * force / 2);
+			GetComponent<Rigidbody> ().AddForce (Vector3.forward * force / 2);
 
+		
 		} else {
 			GetComponent<Rigidbody> ().AddForce (Vector3.down * force/100);
 
 
+		
+		/**
+		} else if (LeftHand.transform.position.x > head.transform.position.x) {
+			//GetComponent<Rigidbody> ().AddForce (Vector3.up + 5);
+
+			Debug.Log ("LEFTHAND");
+			// Not flying, but moving left
+			GetComponent<Rigidbody> ().AddForce (Vector3.right * force);
+			GetComponent<Rigidbody> ().AddForce (Vector3.back * force);
+			flying = false;
+
+		} else if (RightHand.transform.position.x < head.transform.position.x) {
+			Debug.Log ("RIGHTHAND");
+			// Not flying, but moving right
+			GetComponent<Rigidbody> ().AddForce (Vector3.left * force);
+			GetComponent<Rigidbody> ().AddForce (Vector3.back * force);
+			flying = false;
+
+
+		//}else if (LeftHand.transform.position.z > CameraRig.transform.position.z &&
+		//	RightHand.transform.position.z >= CameraRig.transform.position.z){
+			//
+		//	GetComponent<Rigidbody> ().AddForce (Vector3.forward * force);
+
+		} else if (LeftHand.transform.position.y < CameraRig.transform.position.y &&
+		           RightHand.transform.position.y < CameraRig.transform.position.y) {
+
+			GetComponent<Rigidbody> ().AddForce (Vector3.down * force);
+			GetComponent<Rigidbody> ().AddForce (Vector3.back * force / 2);
+
+			// Not flying and not moving
+			//flying = false;
+		*/
+
 		}
+
+
 	}
+		/**
+	  public void OnTriggerEnter(Collider other){
+		Debug.Log ("box on top woooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo");
+		//if (other.gameObject.tag == "fly") {
+
+		//if (lefthand.
+			Debug.Log ("Check before");
+
+			// Fly Forward
+			GetComponent<Rigidbody> ().AddForce (Vector3.forward * force);
+
+			// Fly Upwards
+			GetComponent<Rigidbody> ().AddForce (Vector3.up * force);
+
+			Debug.Log ("WingIsTouched2");
+		}
+
+
+	}
+
+*/
+
 	}
 
 
